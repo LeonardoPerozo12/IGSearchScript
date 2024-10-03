@@ -26,3 +26,4 @@ if __name__ == '__main__':
 
     # Close the browser when done
     driver.close()
+    # try using the function driver.quit() to close all of the tabs in the program, instead of closing the tab it is in
