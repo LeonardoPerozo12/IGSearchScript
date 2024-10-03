@@ -28,12 +28,14 @@ def Scroll(driver: webdriver.Edge):
                     driver.execute_script(f"window.open('{profileUrl}', '_blank');")
 
                     # Switch to the new tab (most recent tab)
-                    driver.switch_to.window(driver.window_handles[-1])
+                    driver.switch_to.window(driver.window_handles[-1]) 
+                    #TRY TO CORRECT THE SYNTAX "switch_to_window()" and see if it works
 
                     # Here you can interact with the profile, if needed
 
                     # Switch back to the original tab (first tab)
                     driver.switch_to.window(driver.window_handles[0])
+                    #TRY TO CORRECT THE SYNTAX "switch_to_window()" and see if it works
 
         except Exception as e:
             print(f"Error processing post {i + 1}: {e}")
