@@ -6,42 +6,44 @@ import time
 
 def Scroll(driver: webdriver.Edge):
     # Wait for posts to load
-    time.sleep(5)
+    time.sleep(2.5)
+    Valid_Profiles = []
     
     # Find the posts (typically they are inside <article> tags on Instagram)
-    posts = driver.find_elements(By.TAG_NAME, 'article')
 
-    for i, post in enumerate(posts):
-        try:
-            # Extract post header and sections (this part depends on Instagram's DOM structure)
-            postHeader = post.find_element(By.TAG_NAME, 'div')
-            postSections = postHeader.find_elements(By.TAG_NAME, 'div')
+    while len(Valid_Profiles) < 10:
+        posts = driver.find_elements(By.TAG_NAME, 'article')
+        
+        for i, post in enumerate(posts):
+            try:
+                # Extract post header and sections (this part depends on Instagram's DOM structure)
+                postHeader = post.find_element(By.TAG_NAME, 'div')
+                postSections = postHeader.find_elements(By.TAG_NAME, 'div')
 
-            for j, post2 in enumerate(postSections):
-                if j == 0:
-                    # Fetch the anchor tag which contains the post's URL
-                    profileAnchor = post2.find_element(By.TAG_NAME, 'a')
-                    profileUrl = profileAnchor.get_attribute('href')
-                    print(f"Profile {i + 1} URL: {profileUrl}")
+                for j, post2 in enumerate(postSections):
+                    if j == 0:
+                        # Fetch the anchor tag which contains the post's URL
+                        profileAnchor = post2.find_element(By.TAG_NAME, 'a')
+                        profileUrl = profileAnchor.get_attribute('href')
+                        print(f"Profile {i + 1} URL: {profileUrl}")
+                        if profileUrl in Valid_Profiles:
+                            continue
 
-                    InspectAccount(driver, profileUrl)
-
-                    # Open the profile URL in a new tab
-                    # driver.execute_script(f"window.open('{profileUrl}', '_blank');")
-
-                    # # Switch to the new tab (most recent tab)
-                    # driver.switch_to.window(driver.window_handles[-1])
-
-                    # # Here you can interact with the profile, if needed
-
-                    # # Switch back to the original tab (first tab)
-                    # driver.switch_to.window(driver.window_handles[0])
-        except Exception as e:
-            print(f"Error processing post {i + 1}: {e}")
-    
-    # Scroll down the page to load more posts if needed
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(3)  # Wait for new posts to load
+                        Account_is_Valid = InspectAccount(driver, profileUrl)
+                        if Account_is_Valid == True:
+                            Valid_Profiles.append(profileUrl)
+                        
+                    
+            except Exception as e:
+                print(f"Error processing post {i + 1}: {e}")
+                
+        # Scroll down the page to load more posts if needed
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        
+        time.sleep(5)  # Wait for new posts to load
+        
+    print(f"Valid Profiles : {Valid_Profiles}")
+        
 
 
 
@@ -59,8 +61,12 @@ def InspectAccount(driver: webdriver.Edge, account_url: str) -> bool:
     # Find all section elements within the header
     sections = header.find_elements(By.TAG_NAME, "section")
     
+    
     for i, section in enumerate(sections, start=1):
+        
+        # TODO CHECK BIO FOR EMAIL
         if i == 3:
+            
             # The third section contains the post, follower, and following count inside a ul element
             ul = section.find_element(By.TAG_NAME, "ul")
             
@@ -70,14 +76,28 @@ def InspectAccount(driver: webdriver.Edge, account_url: str) -> bool:
             # The a tag says "followers" and the span tag contains a span with the count
             follower_count = follower_span_obj.find_element(By.TAG_NAME, "a").find_element(By.TAG_NAME, "span").text
             
+            #print(f"Follower count: {follower_count}")
+            
+            if "K" in follower_count:
+                follower_count = float(follower_count.replace("K", "")) * 1000
+                
+            elif "M" in follower_count:
+                follower_count = float(follower_count.replace("M", "")) * 1000000
+            else:
+                follower_count = int(follower_count)
+                
             print(f"Follower count: {follower_count}")
-    
+            
+            driver.close()
+            
+            driver.switch_to.window(driver.window_handles[0])
+            
+            time.sleep(2.5)
+        
+            
+            if follower_count >= 50000:
+            # TODO: RETURN TRUE AND ACCOUNT EMAIL 
+                return True
+            return False                
 
 
-            # # Here you can interact with the profile, if needed
-
-            # # Switch back to the original tab (first tab)
-
-    # Close the tab and switch back to the main tab
-    driver.close()
-    driver.switch_to.window(driver.window_handles[0])
