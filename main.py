@@ -21,8 +21,6 @@ if __name__ == '__main__':
 
     # Scroll through the feed and open profiles in new tabs
     Scroll(driver)
-
-    InspectAccount(driver, account_url)
     # try out thew new InspectAccount Function
     # before trying anything with Instagram's API
     
@@ -31,5 +29,5 @@ if __name__ == '__main__':
     while True: pass
 
     # Close the browser when done
-    driver.close()
+    driver.quit()
     # try using the function driver.quit() to close all of the tabs in the program, instead of closing the tab it is in
