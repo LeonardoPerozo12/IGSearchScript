@@ -21,7 +21,7 @@ def LogIn(driver: webdriver.Edge, password: str, Username: str):
     )
     loginBtn.click()
     
-    notNowBtn = WebDriverWait(driver, 10).until(
+    notNowBtn = WebDriverWait(driver, 15).until(
         ExpCon.visibility_of_element_located((By.XPATH, "//div[text() = 'Not now']"))
     )
     notNowBtn.click()
